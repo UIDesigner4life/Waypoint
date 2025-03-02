@@ -1,0 +1,189 @@
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local waypoints = {}
+
+-- Create UI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game:GetService("CoreGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 350, 0, 450)
+frame.Position = UDim2.new(0.5, -175, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.Parent = frame
+
+-- Top Bar (For Dragging)
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 50)
+topBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+topBar.Parent = frame
+
+local topBarText = Instance.new("TextLabel")
+topBarText.Size = UDim2.new(1, 0, 1, 0)
+topBarText.Text = "Waypoint Manager"
+topBarText.TextColor3 = Color3.fromRGB(255, 255, 255)
+topBarText.Font = Enum.Font.GothamBold
+topBarText.TextSize = 16
+topBarText.BackgroundTransparency = 1
+topBarText.Parent = topBar
+
+-- Enable Dragging
+local dragging, dragInput, startPos, dragStart
+topBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+topBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+topBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Tab Holder
+local tabHolder = Instance.new("Frame")
+tabHolder.Size = UDim2.new(0.9, 0, 0, 40)
+tabHolder.Position = UDim2.new(0.05, 0, 0.12, 0)
+tabHolder.BackgroundTransparency = 1
+tabHolder.Parent = frame
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.FillDirection = Enum.FillDirection.Horizontal
+uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiListLayout.Padding = UDim.new(0, 10)
+uiListLayout.Parent = tabHolder
+
+-- Tabs
+local currentTab = "Waypoints"
+
+local function createTabButton(text)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0.45, 0, 1, 0)
+    button.Text = text
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14
+    button.Parent = tabHolder
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 8)
+    uiCorner.Parent = button
+
+    return button
+end
+
+local waypointsTab = createTabButton("Waypoints")
+local otherTab = createTabButton("Other")
+
+-- Content Frame
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, 0, 0.75, 0)
+contentFrame.Position = UDim2.new(0, 0, 0.23, 0)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = frame
+
+-- Waypoints Content
+local waypointsContent = Instance.new("Frame")
+waypointsContent.Size = UDim2.new(1, 0, 1, 0)
+waypointsContent.BackgroundTransparency = 1
+waypointsContent.Parent = contentFrame
+
+local saveButton = Instance.new("TextButton")
+saveButton.Size = UDim2.new(0.9, 0, 0, 40)
+saveButton.Position = UDim2.new(0.05, 0, 0, 0)
+saveButton.Text = "Save Waypoint"
+saveButton.BackgroundColor3 = Color3.fromRGB(0, 180, 50)
+saveButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+saveButton.Font = Enum.Font.GothamBold
+saveButton.TextSize = 16
+saveButton.Parent = waypointsContent
+
+local savedWaypointsTitle = Instance.new("TextLabel")
+savedWaypointsTitle.Size = UDim2.new(0.9, 0, 0, 30)
+savedWaypointsTitle.Position = UDim2.new(0.05, 0, 0, 50)
+savedWaypointsTitle.Text = "Saved Waypoints"
+savedWaypointsTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+savedWaypointsTitle.Font = Enum.Font.GothamBold
+savedWaypointsTitle.TextSize = 14
+savedWaypointsTitle.BackgroundTransparency = 1
+savedWaypointsTitle.Parent = waypointsContent
+
+local waypointsFrame = Instance.new("ScrollingFrame")
+waypointsFrame.Size = UDim2.new(0.9, 0, 0.7, 0)
+waypointsFrame.Position = UDim2.new(0.05, 0, 0, 80)
+waypointsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+waypointsFrame.ScrollBarThickness = 5
+waypointsFrame.BackgroundTransparency = 1
+waypointsFrame.Parent = waypointsContent
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Padding = UDim.new(0, 10)
+uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiListLayout.Parent = waypointsFrame
+
+-- Save waypoint function
+local function createWaypointButton(index, position)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0.9, 0, 0, 35) -- Smaller button
+    button.Text = "Waypoint " .. index
+    button.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14
+    button.Parent = waypointsFrame
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = button
+
+    button.MouseButton1Click:Connect(function()
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = CFrame.new(position)
+        end
+    end)
+
+    waypointsFrame.CanvasSize = UDim2.new(0, 0, 0, #waypoints * 45)
+end
+
+saveButton.MouseButton1Click:Connect(function()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local position = character.HumanoidRootPart.Position
+        table.insert(waypoints, position)
+        createWaypointButton(#waypoints, position)
+    end
+end)
+
+-- Tab Switching
+local function switchTab(tab)
+    waypointsContent.Visible = (tab == "Waypoints")
+    currentTab = tab
+end
+
+waypointsTab.MouseButton1Click:Connect(function() switchTab("Waypoints") end)
+otherTab.MouseButton1Click:Connect(function() switchTab("Other") end)

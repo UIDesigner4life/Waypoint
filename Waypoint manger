@@ -4,7 +4,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local waypoints = {}
 
--- Create UI
+
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game:GetService("CoreGui")
 
@@ -19,7 +19,7 @@ local uiCorner = Instance.new("UICorner")
 uiCorner.CornerRadius = UDim.new(0, 12)
 uiCorner.Parent = frame
 
--- Top Bar (For Dragging)
+-- drag the UI
 local topBar = Instance.new("Frame")
 topBar.Size = UDim2.new(1, 0, 0, 50)
 topBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -63,7 +63,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Tab Holder
+-- Tab list
 local tabHolder = Instance.new("Frame")
 tabHolder.Size = UDim2.new(0.9, 0, 0, 40)
 tabHolder.Position = UDim2.new(0.05, 0, 0.12, 0)
@@ -99,14 +99,14 @@ end
 local waypointsTab = createTabButton("Waypoints")
 local otherTab = createTabButton("Other")
 
--- Content Frame
+
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, 0, 0.75, 0)
 contentFrame.Position = UDim2.new(0, 0, 0.23, 0)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = frame
 
--- Waypoints Content
+-- Waypoints 
 local waypointsContent = Instance.new("Frame")
 waypointsContent.Size = UDim2.new(1, 0, 1, 0)
 waypointsContent.BackgroundTransparency = 1
@@ -145,7 +145,7 @@ uiListLayout.Padding = UDim.new(0, 10)
 uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 uiListLayout.Parent = waypointsFrame
 
--- Save waypoint function
+-- Save waypoint
 local function createWaypointButton(index, position)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0.9, 0, 0, 35) -- Smaller button
@@ -179,7 +179,7 @@ saveButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Tab Switching
+-- Tab switch enabled by yo daddy rncrazy!!
 local function switchTab(tab)
     waypointsContent.Visible = (tab == "Waypoints")
     currentTab = tab
